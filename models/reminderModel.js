@@ -12,6 +12,10 @@ const reminderSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    lastEmailSend: {
+      type: Date,
+      default: null,
+    },
     deadline: {
       type: Date,
       default: Date.now,
@@ -20,14 +24,15 @@ const reminderSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    category_id: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'Category',
+      required: [true, 'Reminder must belong to a category'],
+    },
     user_id: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
       required: [true, 'Reminder must belong to a user'],
-    },
-    owner: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'User',
     },
   },
   {

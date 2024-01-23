@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 const Reminder = require('../models/reminderModel');
+const Category = require('../models/categoryModel');
 const catchAsync = require('../middlewares/catchAsync');
 const fs = require('fs');
 const path = require('path');
@@ -9,12 +11,21 @@ exports.getReminders = catchAsync(async (req, res, next) => {
   const limit = req.query.limit * 1 || 12;
   const skip = (page - 1) * limit;
 
-  const filterData = {};
+  const userId = req.user._id;
+  const filterData = { user_id: userId };
 
-  const reminders = await Reminder.find(filterData).skip(skip).limit(limit).populate({
-    path: 'category_id',
-    select: '_id name',
-  });
+  const reminders = await Reminder.find(filterData)
+    .skip(skip)
+    .sort({ deadline: -1 })
+    .limit(limit)
+    .populate({
+      path: 'user_id',
+      select: '_id name surname',
+    })
+    .populate({
+      path: 'category_id',
+      select: '_id name',
+    });
 
   const count = await Reminder.countDocuments(filterData);
   const totalPages = Math.ceil(count / limit);
@@ -28,9 +39,14 @@ exports.getReminders = catchAsync(async (req, res, next) => {
     }
   }
 
+  const formattedReminders = reminders.map((reminder) => {
+    const formattedDeadline = moment(reminder.deadline).format('DD/MM/YYYY');
+    return { ...reminder, formattedDeadline };
+  });
+
   res.status(200).json({
     title: 'Reminder',
-    reminders,
+    reminders: formattedReminders,
     currentPage: page,
     page,
     limit,
@@ -49,30 +65,21 @@ exports.getReminder = catchAsync(async (req, res, next) => {
   const page = req.query.page * 1 || 1;
   const skip = (page - 1) * limit;
 
-  console.log('req.query.page');
-  console.log(req.query);
-  console.log(req.query.page);
-
-  const gallery = await Gallery.find(filterData).skip(skip).limit(limit).populate({
+  const reminder = await Reminder.find(filterData).skip(skip).limit(limit).populate({
     path: 'category_id',
     select: 'name _id',
   });
 
-  const count = await Gallery.countDocuments(filterData);
+  console.log(reminder);
+
+  const count = await Reminder.countDocuments(filterData);
   const totalPages = Math.ceil(count / limit);
   let message = '';
-  if (req.query.m) {
-    if (req.query.m === '1') {
-      message = 'Photo added';
-    } else if (req.query.m === '2') {
-      message = 'Photo deleted';
-    }
-  }
 
   res.status(200).json({
-    title: 'Gallery',
-    gallery,
+    title: 'Reminder',
     categories,
+    reminder,
     currentPage: page,
     page,
     limit,
@@ -88,7 +95,7 @@ exports.addReminder = catchAsync(async (req, res, next) => {
   }
 
   res.status(200).json({
-    title: 'Add gallery',
+    title: 'Add reminder',
     status: 'success',
     categories,
   });
@@ -97,23 +104,10 @@ exports.addReminder = catchAsync(async (req, res, next) => {
 exports.createReminder = catchAsync(async (req, res, next) => {
   try {
     req.body._id = new mongoose.Types.ObjectId();
-
-    for (const file of req.files) {
-      const tempPath = file.path;
-      const destinationPath = path.join('./uploads/gallery', file.filename);
-      fs.renameSync(tempPath, destinationPath);
-    }
-
-    for (const fileName of req.files) {
-      const tempPath = fileName.path;
-      const gallery = await Gallery.create({
-        photo: fileName.filename,
-        category_id: req.body.category_id,
-      });
-    }
-
+    req.body.user_id = res.locals.user._id;
+    await Reminder.create(req.body);
     res.status(200).json({
-      message: 'Photo successfully uploaded',
+      message: 'success',
     });
   } catch (err) {
     console.log(err);
@@ -124,7 +118,7 @@ exports.createReminder = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteReminder = catchAsync(async (req, res, next) => {
-  const doc = await Gallery.findByIdAndDelete(req.body.id);
+  const doc = await Reminder.findByIdAndDelete(req.body.id);
 
   try {
     fs.unlinkSync(`./uploads/gallery/${doc.photo}`);

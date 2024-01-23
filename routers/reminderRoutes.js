@@ -5,7 +5,7 @@ const demoMode = require('../middlewares/demo_mode');
 const router = express.Router({ mergeParams: true });
 
 router.use(authController.protect);
-router.route('/reminder').get(authController.protect, reminderController.getReminders);
+router.route('/reminders').get(authController.protect, reminderController.getReminders);
 router.route('/reminder/:id').get(authController.protect, reminderController.getReminder);
 
 router

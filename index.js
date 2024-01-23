@@ -78,11 +78,13 @@ const authRouter = require('./routers/authRoutes');
 const dashboardRouter = require('./routers/dashboardRoutes');
 const userRouter = require('./routers/userRoutes');
 const reminderRouter = require('./routers/reminderRoutes');
+const categoryRouter = require('./routers/categoryRoutes');
 
 app.use('/api/', authRouter);
 app.use('/api/', dashboardRouter);
 app.use('/api/', userRouter);
 app.use('/api/', reminderRouter);
+app.use('/api/', categoryRouter);
 
 http.listen(8001, function () {
   console.log('listening on *:8001');
