@@ -138,40 +138,28 @@ exports.deleteReminder = catchAsync(async (req, res, next) => {
 });
 
 exports.updateReminder = catchAsync(async (req, res, next) => {
+  console.log('req.body');
+  console.log(req.body);
+  //req.body.category_id = new mongoose.Types.ObjectId();
+  console.log(req.body.category_id);
+
   try {
-    const photoId = req.body.id;
-    const name = req.body.name;
-
-    console.log(photoId);
-    console.log(name);
-
-    const photo = await Gallery.findOne({ _id: photoId });
-
-    if (!photo) {
-      return res.status(404).json({
-        message: 'Photo not found',
-      });
+    const reminder = await Reminder.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    //await reminder.save();
+    if (!reminder) {
+      return next(new AppError('No document found with that ID', 404));
     }
-
-    photo.name = name;
-    try {
-      await photo.save();
-    } catch (error) {
-      console.error('Error:', error);
-    }
-
     res.status(200).json({
-      message: 'Photo successfully updated',
+      status: 'success',
+      message: 'success',
     });
   } catch (err) {
     res.status(200).json({
-      message: err,
+      status: 'error',
+      message: err.message,
     });
   }
-});
-
-exports.Photo = catchAsync(async (req, res, next) => {
-  const filename = req.params.filename;
-  const filePath = path.join(process.env.FILE_PATH, 'uploads/gallery', filename);
-  res.sendFile(filePath);
 });

@@ -8,6 +8,8 @@ const dotenv = require('dotenv');
 dotenv.config({ path: './config.env' });
 const DB = process.env.DATABASE;
 const cors = require('cors');
+const cron = require('node-cron');
+const cronReminder = require('./middlewares/cron');
 
 global.token = '';
 
@@ -85,6 +87,16 @@ app.use('/api/', dashboardRouter);
 app.use('/api/', userRouter);
 app.use('/api/', reminderRouter);
 app.use('/api/', categoryRouter);
+
+// Pianifica il cronjob giornaliero alle 00:01
+cron.schedule('1 0 * * *', () => {
+  cronReminder();
+});
+
+cron.schedule('11 22 * * *', () => {
+  console.log('Eseguo il cronjob alle 22:06...');
+  cronReminder();
+});
 
 http.listen(8001, function () {
   console.log('listening on *:8001');

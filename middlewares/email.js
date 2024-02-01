@@ -33,7 +33,6 @@ module.exports = class Email {
       wordwrap: 430,
     };
 
-  
     const mailOptions = {
       from: process.env.EMAIL_FROM,
       to: this.email,
