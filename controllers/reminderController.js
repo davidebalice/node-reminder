@@ -41,7 +41,8 @@ exports.getReminders = catchAsync(async (req, res, next) => {
 
   const formattedReminders = reminders.map((reminder) => {
     const formattedDeadline = moment(reminder.deadline).format('DD/MM/YYYY');
-    return { ...reminder, formattedDeadline };
+    const formattedLastEmailSend = moment(reminder.lastEmailSend).format('DD/MM/YYYY');
+    return { ...reminder, formattedDeadline, formattedLastEmailSend };
   });
 
   res.status(200).json({
@@ -118,17 +119,11 @@ exports.createReminder = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteReminder = catchAsync(async (req, res, next) => {
-  const doc = await Reminder.findByIdAndDelete(req.body.id);
-
-  try {
-    fs.unlinkSync(`./uploads/gallery/${doc.photo}`);
-  } catch (err) {
-    console.error('Error:', err);
-  }
+  const doc = await Reminder.findByIdAndDelete(req.params.id);
 
   res.status(200).json({
     status: 'success',
-    message: 'Photo deleted',
+    message: 'Reminder deleted',
   });
   if (!doc) {
     res.status(200).json({
@@ -138,9 +133,6 @@ exports.deleteReminder = catchAsync(async (req, res, next) => {
 });
 
 exports.updateReminder = catchAsync(async (req, res, next) => {
-  console.log('req.body');
-  console.log(req.body);
-  //req.body.category_id = new mongoose.Types.ObjectId();
   console.log(req.body.category_id);
 
   try {

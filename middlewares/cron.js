@@ -4,17 +4,35 @@ const Reminder = require('../models/reminderModel');
 async function cronReminder() {
   try {
     // Ottieni la data attuale
-    const dataAttuale = new Date();
+    const today = new Date();
 
     // Ottieni i reminder dal database con una data di scadenza prossima
-    const reminderProssimi = await Reminder.find({ deadline: { $gt: dataAttuale } });
+    const reminderNext = await Reminder.find({ deadline: { $gt: today } });
+
+    const localOption = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long',
+    };
 
     // Invia gli email per ciascun reminder prossimo
-    reminderProssimi.forEach((reminder) => {
-      const giorniRimanenti = Math.ceil((reminder.deadline - dataAttuale) / (24 * 60 * 60 * 1000));
-
-      if (giorniRimanenti === 30 || giorniRimanenti === 7 || giorniRimanenti === 1) {
-        new Email('la scadenza è ' + reminder.deadline, 'reminder test', 'web@sitiwebturismo.it').send();
+    reminderNext.forEach(async (reminder) => {
+      const daysRemaining = Math.ceil((reminder.deadline - today) / (24 * 60 * 60 * 1000));
+      reminder.title = reminder.title.replace("'", '`');
+      reminder.description = reminder.description.replace("'", '`');
+      if (daysRemaining === 30 || daysRemaining === 7 || daysRemaining === 3 || daysRemaining === 1) {
+        new Email(
+          '<b>La scadenza di ' +
+            reminder.title +
+            ' è ' +
+            reminder.deadline.toLocaleDateString('it-IT', localOption) +
+            '</b><br />' +
+            reminder.description,
+          'scadenza ' + reminder.title,
+          process.env.EMAIL_RECIPIENT
+        ).send();
+        await Reminder.findByIdAndUpdate(reminder._id, { lastEmailSend: today });
       }
     });
 

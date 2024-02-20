@@ -13,9 +13,24 @@ const cronReminder = require('./middlewares/cron');
 
 global.token = '';
 
+/*
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
+    optionsSuccessStatus: 200,
+  })
+);
+*/
+
+/*
+app.post('*', (req, res) => {
+  console.log('Richiesta POST ricevuta:', req.body);
+});
+*/
+
+app.use(
+  cors({
+    origin: '*',
     optionsSuccessStatus: 200,
   })
 );
@@ -88,13 +103,8 @@ app.use('/api/', userRouter);
 app.use('/api/', reminderRouter);
 app.use('/api/', categoryRouter);
 
-// Pianifica il cronjob giornaliero alle 00:01
-cron.schedule('1 0 * * *', () => {
-  cronReminder();
-});
-
-cron.schedule('11 22 * * *', () => {
-  console.log('Eseguo il cronjob alle 22:06...');
+// Pianifica il cronjob giornaliero alle 23:00
+cron.schedule('00 23 * * *', () => {
   cronReminder();
 });
 
