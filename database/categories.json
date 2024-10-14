@@ -1,0 +1,29 @@
+[{
+  "_id": {
+    "$oid": "65ad35880465bb716e555f15"
+  },
+  "name": "Personal",
+  "createdAt": {
+    "$date": {
+      "$numberLong": "1705849528433"
+    }
+  },
+  "active": true,
+  "order": 1,
+  "slug": "Personal",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "65ad3bea45ea47e30384b622"
+  },
+  "name": "Work",
+  "createdAt": {
+    "$date": {
+      "$numberLong": "1705851071021"
+    }
+  },
+  "active": true,
+  "order": 1,
+  "slug": "work",
+  "__v": 0
+}]

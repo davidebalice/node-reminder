@@ -3,10 +3,8 @@ const Reminder = require('../models/reminderModel');
 
 async function cronReminder() {
   try {
-    // Ottieni la data attuale
     const today = new Date();
 
-    // Ottieni i reminder dal database con una data di scadenza prossima
     const reminderNext = await Reminder.find({ deadline: { $gt: today } });
 
     const localOption = {
@@ -16,12 +14,19 @@ async function cronReminder() {
       weekday: 'long',
     };
 
-    // Invia gli email per ciascun reminder prossimo
     reminderNext.forEach(async (reminder) => {
       const daysRemaining = Math.ceil((reminder.deadline - today) / (24 * 60 * 60 * 1000));
       reminder.title = reminder.title.replace("'", '`');
       reminder.description = reminder.description.replace("'", '`');
-      if (daysRemaining === 30 || daysRemaining === 7 || daysRemaining === 3 || daysRemaining === 1) {
+
+      if (
+        daysRemaining === 30 ||
+        daysRemaining === 15 ||
+        daysRemaining === 7 ||
+        daysRemaining === 3 ||
+        daysRemaining === 2 ||
+        daysRemaining === 1
+      ) {
         new Email(
           '<b>La scadenza di ' +
             reminder.title +
@@ -36,9 +41,9 @@ async function cronReminder() {
       }
     });
 
-    console.log('Email di reminder inviate con successo.');
+    console.log('Email send!.');
   } catch (error) {
-    console.error("Errore durante l'elaborazione dei reminder:", error);
+    console.error('Error:', error);
   }
 }
 module.exports = cronReminder;

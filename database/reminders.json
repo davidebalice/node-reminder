@@ -1,0 +1,51 @@
+[{
+  "_id": {
+    "$oid": "65df4f6834b96a81f41ad450"
+  },
+  "title": "Test",
+  "description": "Test",
+  "lastEmailSend": null,
+  "deadline": {
+    "$date": {
+      "$numberLong": "1711061999000"
+    }
+  },
+  "completed": false,
+  "category_id": {
+    "$oid": "65ad35880465bb716e555f15"
+  },
+  "user_id": {
+    "$oid": "6424725a7dc4effaa7bdb117"
+  },
+  "createdAt": {
+    "$date": {
+      "$numberLong": "1709133672800"
+    }
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "65e19a9ff1c12aa16850f892"
+  },
+  "title": "Fgh1cfff",
+  "description": "Jiu",
+  "lastEmailSend": null,
+  "deadline": {
+    "$date": {
+      "$numberLong": "1710979199000"
+    }
+  },
+  "completed": false,
+  "category_id": {
+    "$oid": "65ad3bea45ea47e30384b622"
+  },
+  "user_id": {
+    "$oid": "6424725a7dc4effaa7bdb117"
+  },
+  "createdAt": {
+    "$date": {
+      "$numberLong": "1709283999975"
+    }
+  },
+  "__v": 0
+}]
